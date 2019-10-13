@@ -21,7 +21,7 @@ int main(int argc, char*argv[])
     for(cnt=0;cnt<numSize;cnt++ )
     {
         //stack->Push(numbers[cnt]);
-        Push(stack,numbers[cnt]);
+        Push(stack,*(numbers+cnt));
 
     }
     int retval =0;
