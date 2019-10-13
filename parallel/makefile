@@ -1,8 +1,8 @@
 CC = gcc
 CFLAGS =  
-LDFLAGS = 
-OBJFILES = stack.o GetNumbers.o timing.o
-TARGET = part_1_serial.out
+LDFLAGS = -lpthread
+OBJFILES = stack.o GetNumbers.o
+TARGET = part_1_parallel.out
 all: $(TARGET)
 $(TARGET): $(OBJFILES)
 	$(CC) $(CFLAGS) -o $(TARGET) $(OBJFILES) $(LDFLAGS)

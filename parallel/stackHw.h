@@ -1,7 +1,7 @@
 #include<stdio.h>
 #include<stdlib.h>
 #include<string.h>
-
+#include <pthread.h>
 //Use these to change iterations and threads
 #define NUM_THREADS 50
 #define ITERATIONS 500
@@ -17,7 +17,7 @@ typedef struct tsllSTACK
 {
     int stackCount;
     struct stNode * head;
-    //pthread_mutex_t stMutex;
+    pthread_mutex_t stMutex;
 }tsllSTACK;
 
 
