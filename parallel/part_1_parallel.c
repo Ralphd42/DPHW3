@@ -44,8 +44,12 @@ int main(int argc, char*argv[])
     {
         pthread_join(threads[thcnt].thread, &status);
     }
+    printf("\nSTACK Filled\n");
+    //PrintAll(stack);
     long long cnt = GetStackCount(stack);
-    printf("\n%lld\n",cnt);
+    printf("\n%lld Number Items lld\n",cnt);
+
+    //show stack
     timing_stop();
     print_timing();
     pthread_exit(NULL);
@@ -65,8 +69,10 @@ void *ProcThread( void *arg)
         {
             pthread_mutex_unlock(&MatRowmutex);
             hasItemstoPUSH =0;
+            printf("\nthead %d has nothing to do\n", inParams->threadid);
         }else
         {
+             
             int i = currm;
             int j = currn;
             currn++;
@@ -75,8 +81,10 @@ void *ProcThread( void *arg)
                 currn=0;    
                 currm++;
             }
-
-
+            pthread_mutex_unlock(&MatRowmutex);
+            Push(inParams->Stack,*(numbers+i));
+            //printf("\nThread %d num %d\n" ,inParams->threadid,*(numbers+i) );
+            printf(" %d " ,inParams->threadid  );
             /* code */
         }
         

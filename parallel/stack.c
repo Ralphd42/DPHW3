@@ -62,6 +62,24 @@ int Pop( tsllSTACK *stack)
     pthread_mutex_unlock(&(stack->stMutex));    
     return retval;
 }
+void PrintAll(tsllSTACK *stack)
+{
+    pthread_mutex_lock(&(stack->stMutex));
+    stNode * start = stack->head;
+    while( start!=NULL)
+    {
+        printf("\n%d", start->data);
+        start = start->next;
+    }
 
+
+
+
+    pthread_mutex_unlock(&(stack->stMutex));
+
+
+
+
+}
 
 
