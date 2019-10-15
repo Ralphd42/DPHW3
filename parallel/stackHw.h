@@ -5,6 +5,8 @@
 //Use these to change iterations and threads
 #define NUM_THREADS 50
 #define ITERATIONS 500
+#define TRUE    1
+#define FALSE   0
 // data structures
 typedef struct stNode
 {

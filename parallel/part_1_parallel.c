@@ -8,8 +8,9 @@ typedef struct ThreadInfo
     int threadid;
     tsllSTACK* Stack;
 }ThreadInfo;
-pthread_mutex_t MatRowmutex = PTHREAD_MUTEX_INITIALIZER;
-pthread_mutex_t popMutex = PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t MatRowmutex     = PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t popMutex        = PTHREAD_MUTEX_INITIALIZER;
+pthread_cond_t  popcond  = PTHREAD_COND_INITIALIZER;
 void *ProcThread( void *arg);
 int currm;  // the current  M
 int currn;  // the current N
@@ -47,10 +48,10 @@ int main(int argc, char*argv[])
     {
         pthread_join(threads[thcnt].thread, &status);
     }
-    printf("\nSTACK Filled\n");
+    
     //PrintAll(stack);
     long long cnt = GetStackCount(stack);
-    printf("\n%lld Number Items lld\n",cnt);
+    printf("\n%lld Number Items\n",cnt);
 
     //show stack
     timing_stop();
@@ -61,10 +62,12 @@ int main(int argc, char*argv[])
 
 void *ProcThread( void *arg)
 {
+    
     //ThreadItem *inParams = (ThreadItem *)arg;
     //MatrixMultiply(inParams);
     // handle pushing first
     ThreadInfo *inParams = (ThreadInfo *)arg;
+    int Allpops =inParams->Maxn  * inParams->Maxm;
     int hasItemstoPUSH =1;
     while (hasItemstoPUSH){
         pthread_mutex_lock(&MatRowmutex);
@@ -72,10 +75,9 @@ void *ProcThread( void *arg)
         {
             pthread_mutex_unlock(&MatRowmutex);
             hasItemstoPUSH =0;
-            printf("\nthead %d has nothing to do\n", inParams->threadid);
+            //printf("\nthead %d has nothing to do\n", inParams->threadid);
         }else
         {
-             
             int i = currm;
             int j = currn;
             currn++;
@@ -86,44 +88,25 @@ void *ProcThread( void *arg)
             }
             pthread_mutex_unlock(&MatRowmutex);
             Push(inParams->Stack,*(numbers+i));
-            //printf("\nThread %d num %d\n" ,inParams->threadid,*(numbers+i) );
-            printf(" %d " ,inParams->threadid  );
-            /* code */
+            //printf(" %d" ,inParams->threadid  );
         }
-        // process pops
-        int needspop =1;
-
-
-        while( needspop )
-        {
-            pthread_mutex_lock(&popMutex);
-            if(popcnt<(inParams->Maxn  * inParams->Maxm))
-            {
-                Pop(inParams->Stack);
-
-
-
-
-            }
-            
-            
-            
-            pthread_mutex_unlock(&popMutex);
-
-
-
-        }
-    
     }
-
-
-
-
-
-
-
-
-
-
+    int needspop =TRUE;
+    //printf("\n Start poping %d\n" ,inParams->threadid  );
+    /*while( needspop )
+    {
+        pthread_mutex_lock(&popMutex);
+        if(popcnt<Allpops)
+        {
+            popcnt++;
+            pthread_mutex_unlock(&popMutex);     
+            Pop(inParams->Stack);
+        }else
+        {
+            pthread_mutex_unlock(&popMutex);
+            needspop =FALSE;
+        }
+        
+    }*/
     pthread_exit(NULL);
 }
