@@ -71,7 +71,7 @@ void *ProcThread( void *arg)
     int hasItemstoPUSH =1;
     while (hasItemstoPUSH){
         pthread_mutex_lock(&MatRowmutex);
-        if(currm>=  inParams->Maxm )   
+        if(currm >=  inParams->Maxm )   
         {
             pthread_mutex_unlock(&MatRowmutex);
             hasItemstoPUSH =0;
@@ -79,7 +79,7 @@ void *ProcThread( void *arg)
         }else
         {
             int i = currm;
-            int j = currn;
+            //int j = currn;
             currn++;
             if( currn>=inParams->Maxn)
             {
