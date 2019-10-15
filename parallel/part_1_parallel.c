@@ -35,7 +35,7 @@ int main(int argc, char*argv[])
     ThreadInfo * threads = (ThreadInfo *)malloc (numThreads * sizeof(ThreadInfo));
     int thcnt =0;
     //build
-    for(;thcnt<numThreads;thcnt++)
+    for(;thcnt<numThreads;++thcnt)
     {
         threads[thcnt].threadid = thcnt;
         threads[thcnt].Stack    = stack;
@@ -44,7 +44,7 @@ int main(int argc, char*argv[])
         pthread_create(&threads[thcnt].thread,NULL,ProcThread ,(void *) &threads[thcnt] );
     }
     void *status;
-    for (thcnt =0; thcnt<numThreads;thcnt++)
+    for (thcnt =0; thcnt<numThreads;++thcnt)
     {
         pthread_join(threads[thcnt].thread, &status);
     }
@@ -80,11 +80,11 @@ void *ProcThread( void *arg)
         {
             int i = currm;
             //int j = currn;
-            currn++;
+            ++currn;
             if( currn>=inParams->Maxn)
             {
                 currn=0;    
-                currm++;
+                ++currm;
             }
             pthread_mutex_unlock(&MatRowmutex);
             Push(inParams->Stack,*(numbers+i));
