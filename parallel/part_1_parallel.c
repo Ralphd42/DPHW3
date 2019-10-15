@@ -9,9 +9,11 @@ typedef struct ThreadInfo
     tsllSTACK* Stack;
 }ThreadInfo;
 pthread_mutex_t MatRowmutex = PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t popMutex = PTHREAD_MUTEX_INITIALIZER;
 void *ProcThread( void *arg);
 int currm;  // the current  M
 int currn;  // the current N
+int popcnt;
 int main(int argc, char*argv[])
 {
     timing_start();
@@ -23,6 +25,7 @@ int main(int argc, char*argv[])
     int numThreads =atoi(argv[2]);
     int iteratiomn = atoi(argv[3]);
     char* fname = argv[1];
+    popcnt=0;
     GetNumbers(fname);
     tsllSTACK* stack;
     stack =CreateStack();
@@ -87,7 +90,29 @@ void *ProcThread( void *arg)
             printf(" %d " ,inParams->threadid  );
             /* code */
         }
-        
+        // process pops
+        int needspop =1;
+
+
+        while( needspop )
+        {
+            pthread_mutex_lock(&popMutex);
+            if(popcnt<(inParams->Maxn  * inParams->Maxm))
+            {
+                Pop(inParams->Stack);
+
+
+
+
+            }
+            
+            
+            
+            pthread_mutex_unlock(&popMutex);
+
+
+
+        }
     
     }
 
