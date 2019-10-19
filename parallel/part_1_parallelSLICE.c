@@ -3,8 +3,10 @@
 typedef struct ThreadInfo
 {
     pthread_t thread;
-    int Maxn;  
-    int Maxm;
+    int IterationCount;  
+     
+    int slicecount;
+    int slicestart;
     int threadid;
     tsllSTACK* Stack;
 }ThreadInfo;
@@ -12,8 +14,8 @@ pthread_mutex_t MatRowmutex     = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t popMutex        = PTHREAD_MUTEX_INITIALIZER;
 pthread_cond_t  popcond  = PTHREAD_COND_INITIALIZER;
 void *ProcThread( void *arg);
-int currm;  // the current  M
-int currn;  // the current N
+//int currm;  // the current  M
+//int currn;  // the current N
 int popcnt;
 int main(int argc, char*argv[])
 {
@@ -34,15 +36,56 @@ int main(int argc, char*argv[])
     // build the threads
     ThreadInfo * threads = (ThreadInfo *)malloc (numThreads * sizeof(ThreadInfo));
     int thcnt =0;
-    //build
-    for(;thcnt<numThreads;++thcnt)
+    //build slice cnt ant slice start
+    int slicesz =0;
+    if(numSize%numThreads ==0)
     {
-        threads[thcnt].threadid = thcnt;
-        threads[thcnt].Stack    = stack;
-        threads[thcnt].Maxm     = numSize;
-        threads[thcnt].Maxn     = iteratiomn;
-        pthread_create(&threads[thcnt].thread,NULL,ProcThread ,(void *) &threads[thcnt] );
+        slicesz =(numSize/numThreads);
+        for(;thcnt<(numThreads);++thcnt)
+        {
+            threads[thcnt].threadid = thcnt;
+            threads[thcnt].Stack    = stack;
+            threads[thcnt].slicestart     = thcnt* slicesz;
+            threads[thcnt].IterationCount = iteratiomn;
+            threads[thcnt].slicecount     = slicesz;
+            pthread_create(&threads[thcnt].thread,NULL,ProcThread ,(void *) &threads[thcnt] );
+        }
+
+    }else
+    {
+       int extras =numSize%numThreads;
+        slicesz =(numSize/numThreads);
+        int sliceStart =0;
+        for(;thcnt<(numThreads);++thcnt)
+        {
+            threads[thcnt].threadid = thcnt;
+            threads[thcnt].Stack    = stack;
+            int adder =0;
+            if( extras>0)    
+            {
+                --extras;
+                adder=1;
+            }
+            
+            
+            threads[thcnt].slicestart     = sliceStart;//thcnt* slicesz;
+            threads[thcnt].IterationCount = iteratiomn;
+            threads[thcnt].slicecount     = (slicesz  +adder);
+            pthread_create(&threads[thcnt].thread,NULL,ProcThread ,(void *) &threads[thcnt] );
+            sliceStart +=  (slicesz  +adder);
+        }
     }
+    
+
+
+
+
+    
+
+
+
+
+
     void *status;
     for (thcnt =0; thcnt<numThreads;++thcnt)
     {
@@ -67,30 +110,21 @@ void *ProcThread( void *arg)
     //MatrixMultiply(inParams);
     // handle pushing first
     ThreadInfo *inParams = (ThreadInfo *)arg;
-    int Allpops =inParams->Maxn  * inParams->Maxm;
-    int hasItemstoPUSH =1;
-    while (hasItemstoPUSH){
-        pthread_mutex_lock(&MatRowmutex);
-        if(currm >=  inParams->Maxm )   
+    //int Allpops =inParams->Maxn  * inParams->Maxm;
+    int hasItemstoPUSH =TRUE;
+    int i ;
+    int icnt;
+    int end = inParams->slicestart + inParams->slicecount;
+     
+    for(icnt =inParams->slicestart; icnt<end ; ++icnt)
+    {
+        int repcnt;
+        for (repcnt=0;repcnt<inParams->IterationCount;repcnt++)
         {
-            pthread_mutex_unlock(&MatRowmutex);
-            hasItemstoPUSH =0;
-            //printf("\nthead %d has nothing to do\n", inParams->threadid);
-        }else
-        {
-            int i = currm;
-            //int j = currn;
-            ++currn;
-            if( currn>=inParams->Maxn)
-            {
-                currn=0;    
-                ++currm;
-            }
-            pthread_mutex_unlock(&MatRowmutex);
-            Push(inParams->Stack,*(numbers+i));
-            //printf(" %d" ,inParams->threadid  );
+            Push(inParams->Stack,*(numbers+icnt));
         }
     }
+    
     int needspop =TRUE;
     //printf("\n Start poping %d\n" ,inParams->threadid  );
     /*while( needspop )
