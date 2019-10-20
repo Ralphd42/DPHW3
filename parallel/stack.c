@@ -1,12 +1,5 @@
  #include "stackHw.h"
-
- //void Push(stNode *head,int number);
-
-
-
-
  
-
 extern tsllSTACK* CreateStack(){
     tsllSTACK* newStack = (tsllSTACK* )malloc(sizeof(tsllSTACK ));
     newStack->head=NULL;
@@ -25,7 +18,7 @@ long long GetStackCount(tsllSTACK *stack){
     stNode * start =stack->head;
     while (start)
     {
-        retval ++;    
+        ++retval;    
         start = start->next;
     }
     pthread_mutex_unlock(&(stack->stMutex));
@@ -71,15 +64,7 @@ void PrintAll(tsllSTACK *stack)
         printf("\n%d", start->data);
         start = start->next;
     }
-
-
-
-
     pthread_mutex_unlock(&(stack->stMutex));
-
-
-
-
 }
 
 

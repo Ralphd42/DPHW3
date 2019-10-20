@@ -10,7 +10,7 @@ typedef struct ThreadInfo
 }ThreadInfo;
 pthread_mutex_t MatRowmutex     = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t popMutex        = PTHREAD_MUTEX_INITIALIZER;
-pthread_cond_t  popcond  = PTHREAD_COND_INITIALIZER;
+pthread_cond_t  popcond         = PTHREAD_COND_INITIALIZER;
 void *ProcThread( void *arg);
 int currm;  // the current  M
 int currn;  // the current N
@@ -51,7 +51,7 @@ int main(int argc, char*argv[])
     
     //PrintAll(stack);
     long long cnt = GetStackCount(stack);
-    printf("\n%lld Number Items\n",cnt);
+    
 
     //show stack
     timing_stop();
@@ -93,20 +93,22 @@ void *ProcThread( void *arg)
     }
     int needspop =TRUE;
     //printf("\n Start poping %d\n" ,inParams->threadid  );
-    /*while( needspop )
+    while( needspop )
     {
         pthread_mutex_lock(&popMutex);
         if(popcnt<Allpops)
         {
-            popcnt++;
-            pthread_mutex_unlock(&popMutex);     
-            Pop(inParams->Stack);
+            if(GetStackCount(inParams->Stack)>0){
+                ++popcnt;
+                Pop(inParams->Stack);
+                pthread_mutex_unlock(&popMutex);
+            }
         }else
         {
             pthread_mutex_unlock(&popMutex);
             needspop =FALSE;
         }
         
-    }*/
+    }
     pthread_exit(NULL);
 }
