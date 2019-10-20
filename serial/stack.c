@@ -10,19 +10,23 @@ int main(int argc, char*argv[])
     tsllSTACK * stack;
     stack =CreateStack();
     
-    if(argc<2)
+    if(argc<3)
     {
-        perror("\nUsage ./matmul <inputfile.csv>\n");
+        perror("\nUsage ./par_1_ser <inputfile.csv> <iterations>\n");
         exit(-1);
     }
+    int iteratiomn = atoi(argv[2]);
     char * filename= argv[1];
     GetNumbers(filename);
     int cnt =0;
     for(cnt=0;cnt<numSize;cnt++ )
     {
         //stack->Push(numbers[cnt]);
-        Push(stack,*(numbers+cnt));
-
+        int iter;
+        for(iter =0;iter < iteratiomn;iter++)
+        {    
+            Push(stack,*(numbers+cnt));
+        }
     }
     int retval =0;
     long long scnt = GetStackCount(stack);
@@ -31,8 +35,11 @@ int main(int argc, char*argv[])
     for(cnt=0;cnt<numSize;cnt++ )
     {
         //stack->Push(numbers[cnt]);
+        int iter;
+        for(iter =0;iter < iteratiomn;iter++)
+        {
         int poppedOut =Pop(stack);
-        printf("%d\n",poppedOut );
+        }
     }
     timing_stop();
     print_timing();
